@@ -3,6 +3,7 @@
 # Raspberry Pi clock radio
 
 require 'i2c'
+require 'daemons'
 
 class ClockRadio
 
@@ -67,6 +68,7 @@ class ClockRadio
     count = 0
     colon = false
     Signal.trap("INT") do running = false end
+    Signal.trap("TERM") do running = false end
     while(running) do
       write_digits(Time.now.localtime.strftime("%H%M"))
       sleep 0.25
@@ -81,4 +83,6 @@ class ClockRadio
 
 end
 
-ClockRadio.new.start
+Daemons.run_proc('clockradio.rb') do
+  ClockRadio.new.start
+end
