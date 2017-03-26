@@ -7,7 +7,7 @@ require 'i2c'
 class ClockRadio
 
   attr_reader :i2c
-  attr_accessor :i2c_addr, :stopped
+  attr_accessor :i2c_addr
 
   SEVEN_SEGMENT_MAP = {
     ' ' => [ 0x00, 0x00 ],
@@ -37,7 +37,6 @@ class ClockRadio
     i2c.write(i2c_addr, 0x21)
     display_brightness(8)
     i2c.write(i2c_addr, 0x81)
-    dots(colon: true)
   end
 
   def display_off
@@ -64,13 +63,18 @@ class ClockRadio
   end
 
   def start
-    Signal.trap("TERM") do
-      stopped = true
-      display_off
-    end
-    while(!stopped) do
-      write_digits(Time.now.strftime("%H%M"))
+    running = true
+    count = 0
+    colon = false
+    Signal.trap("INT") do running = false end
+    while(running) do
+      write_digits(Time.now.localtime.strftime("%H%M"))
       sleep 0.25
+      count += 1
+      if count >= 4
+        count = 0
+        dots(colon: (colon = !colon))
+      end
     end
     display_off
   end
