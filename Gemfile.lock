@@ -3,6 +3,7 @@ GEM
   specs:
     daemons (1.2.4)
     i2c (0.4.0)
+    rpi_gpio (0.3.2)
 
 PLATFORMS
   ruby
@@ -10,6 +11,7 @@ PLATFORMS
 DEPENDENCIES
   daemons
   i2c
+  rpi_gpio
 
 BUNDLED WITH
    1.14.6
